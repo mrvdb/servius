@@ -84,7 +84,7 @@ markdown' fp = do
         , msAddHeadingId = True
         }
 
-#ifdef ORGMODE_SUPPORt
+#ifdef ORGMODE_SUPPORT
 orgmode :: Text -> IO Response
 orgmode fp = do
     str <- readFileUtf8 fp
