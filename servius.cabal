@@ -23,6 +23,7 @@ executable servius
                      , bytestring
                      , http-types < 0.10
                      , markdown
+                     , pandoc
                      , shakespeare
                      , text
                      , wai

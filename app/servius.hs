@@ -22,6 +22,9 @@ import           Text.Lucius                        (luciusRT)
 import           Text.Markdown                      (def, msXssProtect, msAddHeadingId, markdown)
 import           WaiAppStatic.CmdLine               (docroot, runCommandLine)
 
+import           Text.Pandoc                        (def, readOrg, writeHtml)
+import           Text.Pandoc.Error                  (handleError)
+
 main :: IO ()
 main = runCommandLine (shake . docroot)
 
@@ -33,6 +36,7 @@ shake docroot app req respond
     | ".lucius" `T.isSuffixOf` l = lucius pr >>= respond
     | ".markdown" `T.isSuffixOf` l = markdown' pr >>= respond
     | ".md" `T.isSuffixOf` l = markdown' pr >>= respond
+    | ".org" `T.isSuffixOf` l = orgmode pr >>= respond
     | otherwise = app req respond
   where
     p = pathInfo req
@@ -75,3 +79,10 @@ markdown' fp = do
         { msXssProtect = False
         , msAddHeadingId = True
         }
+
+orgmode :: Text -> IO Response
+orgmode fp = do
+    str <- readFileUtf8 fp
+    let html = writeHtml def (handleError $ readOrg def str)
+    return $ responseBuilder status200 [("Content-Type", "text/html; charset=utf-8")] $ renderHtmlBuilder html
+
